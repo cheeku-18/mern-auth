@@ -4,7 +4,6 @@ import { AppContent } from "../context/AppContext";
 
 const Header = () => {
   const { userData } = useContext(AppContent);
-  console.log("userdata", userData);
 
   return (
     <div className="flex flex-col items-center mt-20 px-4 text-center text-gray-800">

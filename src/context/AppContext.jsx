@@ -1,44 +1,36 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 export const AppContent = createContext();
 
-export const AppContextProvider = ({ children }) => {
+export const AppContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedin, setIsLoggedin] = useState(false);
-  const [userData, setUserData] = useState(null);
-
+  const [userData, setUserData] = useState(false);
   const getAuthState = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}api/auth/is-auth`, {
-        withCredentials: true,
-      });
+      const { data } = await axios.get(backendUrl + "api/auth/is-auth");
       if (data.success) {
         setIsLoggedin(true);
-        setUserData(data.user);
+        getUserData();
       }
     } catch (error) {
-      console.error("Error checking auth state:", error);
-      toast.error("Unauthorized. Please log in.");
+      toast.error(error.message);
     }
   };
 
-  const login = async (email, password) => {
+  const getUserData = async () => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}api/auth/login`,
-        { email, password },
-        { withCredentials: true }
-      );
-      if (data.success) {
-        toast.success("Login successful!");
-        setIsLoggedin(true);
-        setUserData(data.user);
-      }
+      console.log("getting it", backendUrl);
+      const { data } = await axios.get(backendUrl + "api/user/data");
+      console.log("getUserData", data);
+
+      data.success ? setUserData(data.userData) : toast.error(data.message);
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "Login failed.");
+      console.error(error);
     }
   };
 
@@ -49,9 +41,55 @@ export const AppContextProvider = ({ children }) => {
   const value = {
     backendUrl,
     isLoggedin,
+    setIsLoggedin,
     userData,
-    login,
+    setUserData,
+    getUserData,
   };
-
-  return <AppContent.Provider value={value}>{children}</AppContent.Provider>;
+  return (
+    <AppContent.Provider value={value}>{props.children}</AppContent.Provider>
+  );
 };
+
+// import { createContext } from "react";
+// import { useState } from "react";
+// import axios from "axios";
+// import { toast } from "react-toastify";
+
+// export const AppContext = createContext();
+
+// export const AppContextProvider = (props) => {
+//   const backendUrl =
+//     (import.meta.env.VITE_BACKEND_URL || "http://localhost:4000").replace(
+//       /\/+$/,
+//       ""
+//     ) + "/";
+//   const [isLoggedin, setIsLoggedin] = useState(false);
+//   const [userData, setUserData] = useState(false);
+
+//   const getUserData = async () => {
+//     try {
+//       console.log("Fetching user data from:", `${backendUrl}api/user/data`);
+//       const { data } = await axios.get(`${backendUrl}api/user/data`);
+//       if (data.success) {
+//         setUserData(data.userData);
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching user data:", error);
+//     }
+//   };
+
+//   const value = {
+//     backendUrl,
+//     isLoggedin,
+//     setIsLoggedin,
+//     userData,
+//     setUserData,
+//     getUserData,
+//   };
+//   return (
+//     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+//   );
+// };

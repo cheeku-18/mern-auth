@@ -42,8 +42,6 @@ const Login = () => {
         });
 
         if (data.success) {
-          console.log("came");
-
           setIsLoggedin(true);
           getUserData();
           navigate("/");
@@ -120,7 +118,9 @@ const Login = () => {
           </button> */}
           <button
             className="w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-medium"
-            onClick={() => {}}
+            onClick={() => {
+              console.log("click");
+            }}
           >
             {state}
           </button>
